@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <title>Exercício do Pássaro</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;  }
+    </style>
+</head>
+<body>
+
+<script>
+
+// a diferença de .js para .min.js é o tamanho do arquivo e sua função, já que o primeiro serve para o desenvolvimento e o segundo, para a leitura "crua" da máquina
+// tanto os arquivos .js e .mi.js possuem as mesmas funcionalidades internas
+// <script> torna o código um "simulador" de javascript, já que na "head" foi determinada que a linguagem dentro de script seria js
+
+var config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+
+    scene: {
+        preload: preload,
+        create: create,
+        update: update,
+    }
+};
+
+var game = new Phaser.Game(config);
+
+var passarinho;
+
+function preload() {
+// carrega a imagem do background
+    this.load.image('bg', 'assets/bg_space-passaro.png');
+// carrega a spritesheet do passarinho e determina o tamanho de cada divisão de imagem, de forma que todas tenham o mesmo
+    this.load.spritesheet('bird', 'assets/bird-purple.png', {frameWidth: 75, frameHeight: 75});
+}
+
+function create() {
+// adiciona a imagem do background no navegador com uma escala definida, com um zoom pouco maior que o normal
+    this.add.image(400, 300, 'bg').setScale(1.2);
+// adiciona a spritesheet no navegador com uma escala definida, com um zoom pouco maior que o normal
+    passarinho = this.add.sprite(100, 300, 'bird').setScale(1.3);
+// dúvida: a key é previamente definida? o computador entende ela?
+// teste: se definida a key "walk", o pássaro ainda bate as asas e movimenta normalmente
+// se a definição da key estiver diferente da de "passarinho.anims.play", o pássaro não bate as asas, mas se movimenta
+    this.anims.create({
+        key: 'fly',
+// define o número de imagens usadas pelo arquivo da spritesheet, já separada em 75x75
+        frames: this.anims.generateFrameNumbers('bird', {start: 0, end: 7}),
+// define a velocidade com que as imagens aparece, ou seja, que o pássaro bate as asas
+        frameRate: 10,
+// define uma repetição infinita, sem necessidade de definir um número inteiro
+        repeat: -1
+    });
+// inicia o movimento identificado na key (aparentemente, qualquer movimento produz o mesmo resultado)
+        passarinho.anims.play('fly', true);
+}
+
+function update() { 
+
+// define o ponto de largada do passarinho em x
+    if(passarinho.x === 100) {
+// define se o passarinho vai ser espelhado ou não no ponto x = 100
+        passarinho.setFlip(false, false);
+// define o tipo de movimento que o passarinho vai fazer em x = 100
+// teste: se mudar o "ida" para "descida", o movimento não é alterado
+// teste: se mudar o "ida" para "cai", o movimento também não é alterado ➜ conclusão: o programa não identifica a função da palavra
+        passarinho.ida = true;
+    }
+
+// define o ponto de largada do passarinho em y
+    if(passarinho.y === 300) {
+// define o tipo de movimento que o passarinho vai fazer em y = 300
+        passarinho.descida = true;
+    }
+
+// define o movimento que o passarinho vai fazer entre 101 e 699 na ida de x
+    if(passarinho.x < 700 && passarinho.ida === true) {
+        console.log("passarinho voa em ida até o limite de x = 700, mas não inicia volta e nem fica espelhado");
+// define quantas unidades de medida o passarinho vai se movimentar nesse intervalo em x
+        passarinho.x += 5;
+    }
+
+// define o movimento que o passarinho vai fazer entre 301 e 499 na descida em y
+    if(passarinho.y < 500 && passarinho.descida === true) {
+// define quantas unidades de medida o passarinho vai se mover nesse intervalo em y
+        passarinho.y += 5;
+    }
+
+// define o ponto final do passarinho em x
+    if(passarinho.x === 700) {
+// define que o passarinho vai ser espelhado verticalmente no ponto 700
+// teste: se mudar o setFlip para (true,true), ele fica de cabeça para baixo e espelhado
+        passarinho.setFlip(true,false);
+// define o tipo de movimento que o passarinho vai fazer no sentido contrário (negando o "ida")
+        passarinho.ida = false;
+    }
+
+// define o ponto final do passarinho em y
+    if(passarinho.y === 500) {
+// define o tipo de movimento que o passarinho vai fazer no sentido contrário (negando o "descida")
+        passarinho.descida = false;
+    }
+
+// define o início da volta do passarinho em x
+    if(passarinho.x > 100 && passarinho.ida === false) {
+        console.log("passarinho voa até em ida até o limite de x = 700, espelha e inicia volta");
+        passarinho.x -= 5;
+    }
+
+// define o início da volta do passarinho em y
+    if(passarinho.y > 300 && passarinho.descida == false){
+        passarinho.y -= 5;
+    }
+
+// "o console do navegador roda infinitamente os dois console.log descritos"
+// "não seria preciso determinar uma variante para definir o console.log?"
+
+// "como adicionar um terceiro movimento de subida em y? passando de 300 para 150"
+}
+
+
+// fechar o script significa voltar a usar o padrão html no código
+</script>
+</body>
